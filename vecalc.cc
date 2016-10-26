@@ -32,7 +32,9 @@ struct Vector {
 // print_vec:
 //	Print contents of Vector v to stdout.
 // In:
-//	v != NULL, v->size > 0, v->elements != NULL.
+//	v != NULL
+//	v->size > 0
+//	v->elements != NULL.
 // Out:
 //	return 	:: true if print successful.
 //		:: false if print unsuccessful.
@@ -54,7 +56,8 @@ Vector* alloc_vec(void) {
 // dealloc_vec:
 //	Deallocate a vector and its contents.
 // In:
-//	v != NULL, v->elements != NULL.
+//	v != NULL
+//	v->elements != NULL.
 // Out:
 //	No return value.
 //	effect	:: v deallocated.
@@ -67,11 +70,61 @@ void dealloc_vec(Vector* v) {
 //	Copy elements in v to new vector.
 //	Add new element e to the end of the new vector.
 // In:
-//	v != NULL, e != NULL.
+//	v != NULL
+//	e != NULL.
 // Out:
 //	return	:: pointer to the newly allocated vector.
 //	effect	:: Input vector (v) is not modified.
 Vector* extend_vec(Vector* v, Elem e) {
+  return null;
+}
+
+// scalar_plus:
+// 	Adds e to each element in v.
+// In:
+//	v != NULL
+//	v->size != 0
+//	e != NULL
+// Out:
+//	return	:: pointer to the modified vector.
+Vector* scalar_plus(Vector* v, Elem e) {
+  return null;
+}
+
+// scalar_minus:
+//	subtracts e from each element in v.
+// In:
+//	v != NULL
+//	v->size != 0
+//	e != NULL
+// Out:
+//	return	:: pointer to the modified vector.
+Vector* scalar_minus(Vector* v, Elem e) {
+  return null;
+}
+
+// scalar_multiply:
+//	Multiply each element in v by e.
+// In:
+//	v != NULL
+//	v->size != 0
+//	e != NULL
+// Out:
+//	return	:: pointer to the modified vector.
+Vector* scalar_mult(Vector* v, Elem e) {
+  return null;
+}
+
+// scalar_divide:
+//	Divides each element in v by e.
+// In:
+//	v != NULL
+//	v->size != 0
+//	e != NULL
+//	e != 0
+// Out:
+//	return	:: pointer to the modified vector.
+Vector* scalar_div(Vector* v, Elem e) {
   return null;
 }
 
@@ -82,8 +135,6 @@ Vector* extend_vec(Vector* v, Elem e) {
 //    none
 // Out:
 //    output produced on standard output
-// Author :: Prof. Anthony Kusalik
-//    (Solution to function provided for assignment).
 void usage( void ) {
   
     puts( " Usage:" );
@@ -98,8 +149,7 @@ void usage( void ) {
 }
 
 
-int main() {
-  // Just some testing for limits and type sizes that I'll use later.
+int main(int argv, char* argc[]) {
 	printf("Sizeof Float: %zu\n", sizeof(float));
 	printf("MAX of uint16: %i\n", std::numeric_limits<uint16_t>::max());
 	printf("epsilong of float: %.16f\n", std::numeric_limits<float>::epsilon());
