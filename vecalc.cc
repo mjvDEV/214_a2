@@ -1,6 +1,8 @@
 #include <cstdio>
-#include <cstdint>
+#include <stdint.h>
 #include <limits>
+#include <cstdlib>
+#include <assert.h>
 
 using namespace std;
 
@@ -15,8 +17,8 @@ typedef float Elem;
 
 // A Vector is a dynamic array of type Elem.
 struct Vector {
-  uint16_t size;
-  Elem* elements;
+  	uint16_t size;
+  	Elem* elements;
 };
 // ... (Vector v, ...) {
 //	for (int i = 0; i < v.size; i++) {
@@ -39,7 +41,7 @@ struct Vector {
 //	return 	:: true if print successful.
 //		:: false if print unsuccessful.
 bool print_vec(Vector* v) {
-    return false;
+    	return false;
 }
 
 // alloc_vec:
@@ -48,9 +50,9 @@ bool print_vec(Vector* v) {
 //	No input values.
 // Out:
 //	return	:: pointer to an empty vector if successful.
-//		:: null if unsuccessful.
+//		:: NULL if unsuccessful.
 Vector* alloc_vec(void) {
-  return null;
+  	return NULL;
 }
 
 // dealloc_vec:
@@ -76,7 +78,7 @@ void dealloc_vec(Vector* v) {
 //	return	:: pointer to the newly allocated vector.
 //	effect	:: Input vector (v) is not modified.
 Vector* extend_vec(Vector* v, Elem e) {
-  return null;
+  	return NULL;
 }
 
 // scalar_plus:
@@ -86,9 +88,10 @@ Vector* extend_vec(Vector* v, Elem e) {
 //	v->size != 0
 //	e != NULL
 // Out:
+
 //	return	:: pointer to the modified vector.
 Vector* scalar_plus(Vector* v, Elem e) {
-  return null;
+  	return NULL;
 }
 
 // scalar_minus:
@@ -100,7 +103,7 @@ Vector* scalar_plus(Vector* v, Elem e) {
 // Out:
 //	return	:: pointer to the modified vector.
 Vector* scalar_minus(Vector* v, Elem e) {
-  return null;
+  	return NULL;
 }
 
 // scalar_multiply:
@@ -112,7 +115,7 @@ Vector* scalar_minus(Vector* v, Elem e) {
 // Out:
 //	return	:: pointer to the modified vector.
 Vector* scalar_mult(Vector* v, Elem e) {
-  return null;
+  	return NULL;
 }
 
 // scalar_divide:
@@ -125,7 +128,7 @@ Vector* scalar_mult(Vector* v, Elem e) {
 // Out:
 //	return	:: pointer to the modified vector.
 Vector* scalar_div(Vector* v, Elem e) {
-  return null;
+  	return NULL;
 }
 
 // Usage
@@ -148,10 +151,30 @@ void usage( void ) {
     puts( "  a <value> - extend vector by additional value" );
 }
 
+/*****************************************************/
+
+// main:
+//	Program entry point.
+// In:
+//	argc > 0
+//	argv[0 .. argc-1] != NULL
+// Out:
+//	return	:: EXIT_SUCCESS if program terminates normally.
+//		:: EXIT_FAILURE otherwise
 
 int main(int argv, char* argc[]) {
-	printf("Sizeof Float: %zu\n", sizeof(float));
-	printf("MAX of uint16: %i\n", std::numeric_limits<uint16_t>::max());
-	printf("epsilong of float: %.16f\n", std::numeric_limits<float>::epsilon());
-	return 0;
+
+#ifdef TESTING
+	// Test alloc_vec
+  	Vector* v = alloc_vec();
+  	assert(v !=  NULL);
+  	
+  	// Test extend_vec
+  	v = extend_vec(v,  1.0);
+  	assert(v->size == 1);
+  	assert(v->elements[0] ==  1.0);
+	
+	
+#endif // TESTING
+	return EXIT_SUCCESS;
 }
