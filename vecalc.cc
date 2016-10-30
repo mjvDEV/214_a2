@@ -170,10 +170,43 @@ int main(int argv, char* argc[]) {
   	assert(v !=  NULL);
   	
   	// Test extend_vec
-  	v = extend_vec(v,  1.0);
+  	v = extend_vec(v, 1.0);
+        assert(v != NULL);
   	assert(v->size == 1);
   	assert(v->elements[0] ==  1.0);
-	
+        v = extend_vec(v, 2.14);
+        assert(v != NULL);
+        assert(v->size == 2);
+        assert(v->elements[1] == 2.14);
+
+        // Test print_vec.
+        bool printed = print_vec(v);
+        assert(printed);
+
+        // Test scalar_plus
+        assert(scalar_plus(v, 10.0) != NULL);
+        assert(v->elements[0] == 11.0);
+        assert(v->elements[1] == 12.14);
+
+        // Test scalar_minus
+        assert(scalar_minus(v, 1.0) != NULL);
+        assert(v->elements[0] == 10.0);
+        assert(v->elements[1] == 11.14);
+        
+        // Test scalar_multiply
+        assert(scalar_multiply(v, 2.0); != NULL);
+        assert(v->elements[0] == 20.0);
+        assert(v->elements[1] == 22.28);
+
+        // Test scalar_divide
+        assert(scalar_divide(v, 2.0); != NULL);
+        assert(v->elements[0] == 10.0);
+        assert(v->elements[1] == 11.14);
+
+        // Test dealloc_vec:
+        // Unfortunately, no way to be completely sure that
+        // deallocation occurred successfully.
+        dealloc_vec(v);	
 	
 #endif // TESTING
 	return EXIT_SUCCESS;
