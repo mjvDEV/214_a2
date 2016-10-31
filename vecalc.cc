@@ -6,12 +6,15 @@
  * October 31, 2016
  * 
  * Written for submission for Assignment 02.
+ * 
+ * Created with Kate editor.
  */
 
 #include <stdio.h>	// for: puts(), printf(), fputs()
 #include <stdint.h>	// for: uint16_t type
 #include <stdlib.h>	// for: EXIT_SUCCESS, EXIT_FAILURE
 #include <assert.h>	// for: assert()
+#include <float.h>	// for: FLT_MAX
 
 using namespace std;
 
@@ -130,14 +133,19 @@ Vector* extend_vec(Vector* v, Elem e) {
 // In:
 //	v != NULL
 //	v->size != 0
+//	v->elements[0 .. size-1] + e < FLT_MAX
 // Out:
 //	return	:: pointer to the modified vector.
 Vector* scalar_plus(Vector* v, Elem e) {
-  if ( NULL == v ) {
+  if ( NULL == v ){
     fputs("ERROR: scalar_plus() failed.\n", stderr);
     return NULL;
   }
   for (uint16_t i = 0; i < v->size; i++) {
+    if ( e > ( FLT_MAX - v->elements[i] ) ) {
+      fputs("ERROR: FLT_MAX exceeded in scalar_plus().\n", stderr);
+      return NULL;
+    }
     v->elements[i] += e;
   }
   return v;
@@ -225,7 +233,7 @@ int main(int, char**) {
   	assert( 1 == v->size);
   	assert( 1.0 == v->elements[0] );
 	
-        v = extend_vec(v, 2.0);
+        v = extend_vec( v, 2.0 );
         assert( NULL != v );
         assert( 2 == v->size );
 	assert( 1.0 == v->elements[0] );
