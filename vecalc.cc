@@ -8,13 +8,10 @@
  * Written for submission for Assignment 02.
  */
 
-#include <stdio.h>	// for: puts()
+#include <stdio.h>	// for: puts(), printf(), fputs()
 #include <stdint.h>	// for: uint16_t type
-//#include <limits.h>	// for: numeric_limits
 #include <stdlib.h>	// for: EXIT_SUCCESS, EXIT_FAILURE
 #include <assert.h>	// for: assert()
-#include <float.h>	// for: FLT_EPSILON
-#include <math.h>	// for: fabs()
 
 using namespace std;
 
@@ -54,6 +51,7 @@ struct Vector {
 //		:: false if print unsuccessful.
 bool print_vec(Vector* v) {
   if ( NULL == v) {
+    fputs("ERROR: print_vec() failed.\n", stderr);
     return false;
   }
   puts("Printing vector contents...");
@@ -61,6 +59,7 @@ bool print_vec(Vector* v) {
     printf("%f\n",  v->elements[i]);
   }
   puts("... done.");
+  return true;
 }
 
 // alloc_vec:
@@ -73,11 +72,13 @@ bool print_vec(Vector* v) {
 Vector* alloc_vec(void) {
   Vector* v = new Vector;
   if ( NULL == v ) {
+    fputs("ERROR: alloc_vec() failed.\n", stderr);
     return NULL;
   }
   v->size = 0;
   v->elements = new Elem[v->size];
   if ( NULL == v->elements) {
+    fputs("ERROR: alloc_vec() failed.\n", stderr);
     return NULL;
   }
   return v;
@@ -107,17 +108,17 @@ void dealloc_vec(Vector* v) {
 //	return	:: pointer to the newly allocated vector.
 //	effect	:: Input vector (v) is not modified.
 Vector* extend_vec(Vector* v, Elem e) {
-  Vector* f = alloc_vec();
-  
-  if (	( NULL ==  v) 		|| 
+  Vector* f = alloc_vec(); 
+  if (	( NULL ==  v)		|| 
 	( 65535 <=  v->size) 	|| 
 	( NULL ==  f)	) {
+   fputs("ERROR: extend_vec() failed.\n", stderr);
    return NULL;
- }
+  }
   
   for (uint16_t i = 0; i < v->size; i++) {
     f->size++;
-    f->elements[i] =  v->elements[i];
+    f->elements[i] = v->elements[i];
   }
   f->elements[f->size] = e;
   f->size++;
@@ -133,6 +134,7 @@ Vector* extend_vec(Vector* v, Elem e) {
 //	return	:: pointer to the modified vector.
 Vector* scalar_plus(Vector* v, Elem e) {
   if ( NULL == v ) {
+    fputs("ERROR: scalar_plus() failed.\n", stderr);
     return NULL;
   }
   for (uint16_t i = 0; i < v->size; i++) {
@@ -149,7 +151,8 @@ Vector* scalar_plus(Vector* v, Elem e) {
 // Out:
 //	return	:: pointer to the modified vector.
 Vector* scalar_minus(Vector* v, Elem e) {
-  	return NULL;
+  fputs("ERROR: scalar_minus() failed.\n", stderr);
+  return NULL;
 }
 
 // scalar_multiply:
@@ -160,7 +163,8 @@ Vector* scalar_minus(Vector* v, Elem e) {
 // Out:
 //	return	:: pointer to the modified vector.
 Vector* scalar_mult(Vector* v, Elem e) {
-  	return NULL;
+  fputs("ERROR: scalar_mult() failed.\n", stderr);
+  return NULL;
 }
 
 // scalar_divide:
@@ -172,7 +176,8 @@ Vector* scalar_mult(Vector* v, Elem e) {
 // Out:
 //	return	:: pointer to the modified vector.
 Vector* scalar_div(Vector* v, Elem e) {
-  	return NULL;
+  fputs("ERROR: scalar_div() failed.\n", stderr);
+  return NULL;
 }
 
 // Usage
@@ -195,19 +200,6 @@ void usage( void ) {
     puts( "  a <value> - extend vector by additional value" );
 }
 
-// fAreEqual:
-//	Determines whether two floats are equal within margin of error.
-// 	NOTE: I added this in case more general equality tests may be
-// 		needed at a later date.
-// In:
-//	f1, f2 are of float type.
-// Out:
-//	return: true if they are equal within margin of error.
-//		false otherwise.
-bool fAreEqual(float f1, float f2) {
-  return (fabs( f1 - f2 ) < FLT_EPSILON);
-}
-
 /*****************************************************/
 
 // main:
@@ -223,42 +215,44 @@ int main(int, char**) {
 #ifdef TESTING
 	// Test alloc_vec
   	Vector* v = alloc_vec();
-  	assert(v !=  NULL);
+  	assert( NULL != v );
+	assert( 0 == v->size );
+	assert( NULL != v->elements );
   	
   	// Test extend_vec
-  	v = extend_vec(v, 1.0);
-        assert(v != NULL);
-  	assert(v->size == 1);
-  	assert(v->elements[0] ==  1.0);
+  	v = extend_vec( v, 1.0 );
+        assert( NULL != v );
+  	assert( 1 == v->size);
+  	assert( 1.0 == v->elements[0] );
+	
         v = extend_vec(v, 2.0);
-        assert(v != NULL);
-        assert(v->size == 2);
-	assert(v->elements[0] == 1.0);
-        assert(v->elements[1] == 2.0);
+        assert( NULL != v );
+        assert( 2 == v->size );
+	assert( 1.0 == v->elements[0] );
+        assert( 2.0 == v->elements[1] );
 
         // Test print_vec.
-        bool printed = print_vec(v);
-        assert(printed);
+        assert( print_vec(v) );
 
         // Test scalar_plus
-        assert(scalar_plus(v, 10.0) != NULL);
-        assert(v->elements[0] == 11.0);
-        assert(v->elements[1] == 12.0);
+        assert( NULL != scalar_plus(v, 10.0) );
+        assert( 11.0 == v->elements[0] );
+        assert( 12.0 == v->elements[1] );
 
         // Test scalar_minus
-        assert(scalar_minus(v, 1.0) != NULL);
-        assert(v->elements[0] == 10.0);
-        assert(v->elements[1] == 11.0);
+        assert( NULL != scalar_minus(v, 1.0) );
+        assert( 10.0 == v->elements[0] );
+        assert( 11.0 == v->elements[1] );
         
         // Test scalar_mult
-        assert(scalar_mult(v, 2.0) != NULL);
-        assert(v->elements[0] == 20.0);
-        assert(v->elements[1] == 22.0);
+        assert( NULL != scalar_mult(v, 2.0) );
+        assert( 20.0 == v->elements[0] );
+        assert( 22.0 == v->elements[1] );
 
         // Test scalar_div
-        assert(scalar_div(v, 2.0) != NULL);
-        assert(v->elements[0] == 10.0);
-        assert(v->elements[1] == 11.0);
+        assert( NULL != scalar_div(v, 2.0) );
+        assert( 10.0 == v->elements[0] );
+        assert( 11.0 == v->elements[1] );
 
         // Test dealloc_vec:
         // Unfortunately, no way to be completely sure that
