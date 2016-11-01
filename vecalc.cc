@@ -15,7 +15,6 @@
 #include <stdlib.h> // for: EXIT_SUCCESS, EXIT_FAILURE
 #include <assert.h> // for: assert()
 #include <float.h>  // for: FLT_MAX
-#include <math.h>   // for: fabs()
 
 using namespace std;
 
