@@ -10,184 +10,181 @@
  * Created with Kate editor.
  */
 
-#include <stdio.h>	// for: puts(), printf(), fputs()
-#include <stdint.h>	// for: uint16_t type
-#include <stdlib.h>	// for: EXIT_SUCCESS, EXIT_FAILURE
-#include <assert.h>	// for: assert()
-#include <float.h>	// for: FLT_MAX
+#include <stdio.h>  // for: puts(), printf(), fputs()
+#include <stdint.h> // for: uint16_t type
+#include <stdlib.h> // for: EXIT_SUCCESS, EXIT_FAILURE
+#include <assert.h> // for: assert()
+#include <float.h>  // for: FLT_MAX
 
 using namespace std;
 
 // An Elem is a single-precision floating point value.
 typedef float Elem;
 // ... (Elem e, ...) {
-//	... = e + ...;
-//	... = e - ...;
-//	... = e / ...; // a non-zero value.
-//	... = e * ...;
+//  ... = e + ...;
+//  ... = e - ...;
+//  ... = e / ...; // a non-zero value.
+//  ... = e * ...;
 // }
 
 // A Vector is a dynamic array of type Elem.
 struct Vector {
-  	uint16_t size;
-  	Elem* elements;
+    uint16_t size;
+    Elem* elements;
 };
 // ... (Vector v, ...) {
-//	for (int i = 0; i < v.size; i++) {
-//		v.elements[i] ...;
-//	}
+//  for (int i = 0; i < v.size; i++) {
+//      v.elements[i] ...;
+//  }
 // }
 // ... (Vector* v, ...) {
-//	for (int i = 0; i < v->size; i++) {
-//		v->elements[i] ...;
-//	}
+//  for (int i = 0; i < v->size; i++) {
+//      v->elements[i] ...;
+//  }
 // }
 
 // print_vec:
-//	Print contents of Vector v to stdout.
+//  Print contents of Vector v to stdout.
 // In:
-//	v != NULL
-//	v->size > 0
-//	v->elements != NULL.
+//  v != NULL
+//  v->size > 0
+//  v->elements != NULL.
 // Out:
-//	return 	:: true if print successful.
-//		:: false if print unsuccessful.
+//  return  :: true if print successful.
+//      :: false if print unsuccessful.
 bool print_vec(Vector* v) {
-  if ( NULL == v) {
-    fputs("ERROR: print_vec() failed.\n", stderr);
-    return false;
-  }
-  puts("Printing vector contents...");
-  for (uint16_t i = 0; i < v->size; i++) {
-    printf("%f\n",  v->elements[i]);
-  }
-  puts("... done.");
-  return true;
+    if ( NULL == v) {
+        fputs("ERROR: print_vec() failed.\n", stderr);
+        return false;
+    }
+    puts("Printing vector contents...");
+    for (uint16_t i = 0; i < v->size; i++) {
+        printf("%g\n",  v->elements[i]);
+    }
+    puts("... done.");
+    return true;
 }
 
 // alloc_vec:
-//	Allocate an empty (zero-length) vector.
+//  Allocate an empty (zero-length) vector.
 // In:
-//	No input values.
+//  No input values.
 // Out:
-//	return	:: pointer to an empty vector if successful.
-//		:: NULL if unsuccessful.
+//  return  :: pointer to an empty vector if successful.
+//      :: NULL if unsuccessful.
 Vector* alloc_vec(void) {
-  Vector* v = new Vector;
-  if ( NULL == v ) {
-    fputs("ERROR: alloc_vec() failed.\n", stderr);
-    return NULL;
-  }
-  v->size = 0;
-  v->elements = NULL;
-  if ( NULL == v->elements) {
-    fputs("ERROR: alloc_vec() failed.\n", stderr);
-    return NULL;
-  }
-  return v;
+    Vector* v = new Vector;
+    if ( NULL == v ) {
+        fputs("ERROR: alloc_vec() failed.\n", stderr);
+        return NULL;
+    }
+    v->size = 0;
+    v->elements = NULL;
+    return v;
 }
 
 // dealloc_vec:
-//	Deallocate a vector and its contents.
+//  Deallocate a vector and its contents.
 // In:
-//	v != NULL
-//	v->elements != NULL.
+//  v != NULL
+//  v->elements != NULL.
 // Out:
-//	No return value.
-//	effect	:: v deallocated.
+//  No return value.
+//  effect  :: v deallocated.
 void dealloc_vec(Vector* v) {
-  delete [] v->elements;
-  delete v;
+    delete [] v->elements;
+    delete v;
 }
 
 // extend_vec:
-//	Allocate a new vector one element greater in size than v.
-//	Copy elements in v to new vector.
-//	Add new element e to the end of the new vector.
+//  Allocate a new vector one element greater in size than v.
+//  Copy elements in v to new vector.
+//  Add new element e to the end of the new vector.
 // In:
-//	v != NULL
-// 	v->size < 65535
+//  v != NULL
+//  v->size < 65535
 // Out:
-//	return	:: pointer to the newly allocated vector.
-//	effect	:: Input vector (v) is not modified.
+//  return  :: pointer to the newly allocated vector.
+//  effect  :: Input vector (v) is not modified.
 Vector* extend_vec(Vector* v, Elem e) {
-  Vector* f = alloc_vec(); 
-  if (	( NULL ==  v)		|| 
-	( 65535 <=  v->size) 	|| 
-	( NULL ==  f)	) {
-   fputs("ERROR: extend_vec() failed.\n", stderr);
-   return NULL;
-  }
+    Vector* f = alloc_vec(); 
+    if (    ( NULL ==  v)           || 
+            ( 65535 <=  v->size)    || 
+            ( NULL ==  f)   ) {
+        fputs("ERROR: extend_vec() failed.\n", stderr);
+        return NULL;
+    }
 
-  f->elements = new Elem[v->size + 1];
-  for (uint16_t i = 0; i < v->size; i++) {
+    f->elements = new Elem[v->size + 1];
+
+    for (uint16_t i = 0; i < v->size; i++) {
+        f->size++;
+        f->elements[i] = v->elements[i];
+    }
+    f->elements[f->size] = e;
     f->size++;
-    f->elements[i] = v->elements[i];
-  }
-  f->elements[f->size] = e;
-  f->size++;
-  return f;
+    return f;
 }
 
 // scalar_plus:
-// 	Adds e to each element in v.
+//  Adds e to each element in v.
 // In:
-//	v != NULL
-//	v->size != 0
-//	v->elements[0 .. size-1] + e < FLT_MAX
+//  v != NULL
+//  v->size != 0
+//  v->elements[0 .. size-1] + e < FLT_MAX
 // Out:
-//	return	:: pointer to the modified vector.
+//  return  :: pointer to the modified vector.
 Vector* scalar_plus(Vector* v, Elem e) {
-  if (	( NULL == v )	||
-      	( 0 == v->size) ) {
-    fputs("ERROR: scalar_plus() failed.\n", stderr);
-    return NULL;
-  }
-  for (uint16_t i = 0; i < v->size; i++) {
-    if ( e > ( FLT_MAX - v->elements[i] ) ) {
-      fputs("ERROR: FLT_MAX exceeded in scalar_plus().\n", stderr);
-      return NULL;
+    if (    ( NULL == v )   ||
+            ( 0 == v->size) ) {
+        fputs("ERROR: scalar_plus() failed.\n", stderr);
+        return NULL;
     }
-    v->elements[i] += e;
-  }
-  return v;
+    for (uint16_t i = 0; i < v->size; i++) {
+        if ( e > ( FLT_MAX - v->elements[i] ) ) {
+            fputs("ERROR: FLT_MAX exceeded in scalar_plus().\n", stderr);
+            return NULL;
+        }
+        v->elements[i] += e;
+    }
+    return v;
 }
 
 // scalar_minus:
-//	subtracts e from each element in v.
+//  subtracts e from each element in v.
 // In:
-//	v != NULL
-//	v->size != 0
+//  v != NULL
+//  v->size != 0
 // Out:
-//	return	:: pointer to the modified vector.
+//  return  :: pointer to the modified vector.
 Vector* scalar_minus(Vector* v, Elem e) {
-  fputs("ERROR: scalar_minus() failed.\n", stderr);
-  return NULL;
+    fputs("ERROR: scalar_minus() failed.\n", stderr);
+    return NULL;
 }
 
 // scalar_multiply:
-//	Multiply each element in v by e.
+//  Multiply each element in v by e.
 // In:
-//	v != NULL
-//	v->size != 0
+//  v != NULL
+//  v->size != 0
 // Out:
-//	return	:: pointer to the modified vector.
+//  return  :: pointer to the modified vector.
 Vector* scalar_mult(Vector* v, Elem e) {
-  fputs("ERROR: scalar_mult() failed.\n", stderr);
-  return NULL;
+    fputs("ERROR: scalar_mult() failed.\n", stderr);
+    return NULL;
 }
 
 // scalar_divide:
-//	Divides each element in v by e.
+//  Divides each element in v by e.
 // In:
-//	v != NULL
-//	v->size != 0
-//	e != 0
+//  v != NULL
+//  v->size != 0
+//  e != 0
 // Out:
-//	return	:: pointer to the modified vector.
+//  return  :: pointer to the modified vector.
 Vector* scalar_div(Vector* v, Elem e) {
-  fputs("ERROR: scalar_div() failed.\n", stderr);
-  return NULL;
+    fputs("ERROR: scalar_div() failed.\n", stderr);
+    return NULL;
 }
 
 // Usage
@@ -198,7 +195,6 @@ Vector* scalar_div(Vector* v, Elem e) {
 // Out:
 //    output produced on standard output
 void usage( void ) {
-  
     puts( " Usage:" );
     puts( "  p   - print vector" );
     puts( "  q,e - quit, end" );
@@ -213,62 +209,73 @@ void usage( void ) {
 /*****************************************************/
 
 // main:
-//	Program entry point.
+//  Program entry point.
 // In:
-//	argc > 0
-//	argv[0 .. argc-1] != NULL
+//  argc > 0
+//  argv[0 .. argc-1] != NULL
 // Out:
-//	return	:: EXIT_SUCCESS if program terminates normally.
-//		:: EXIT_FAILURE otherwise
+//  return  :: EXIT_SUCCESS if program terminates normally.
+//      :: EXIT_FAILURE otherwise
 int main(int, char**) {
 
 #ifdef TESTING
-	// Test alloc_vec
-  	Vector* v = alloc_vec();
-  	assert( NULL != v );
-	assert( 0 == v->size );
-	assert( NULL != v->elements );
-  	
-  	// Test extend_vec
-  	v = extend_vec( v, 1.0 );
-        assert( NULL != v );
-  	assert( 1 == v->size);
-  	assert( 1.0 == v->elements[0] );
-	
-        v = extend_vec( v, 2.0 );
-        assert( NULL != v );
-        assert( 2 == v->size );
-	assert( 1.0 == v->elements[0] );
-        assert( 2.0 == v->elements[1] );
 
-        // Test print_vec.
-        assert( print_vec(v) );
+    // Test alloc_vec
+    Vector* v = alloc_vec();
+    assert( NULL != v );
+    assert( 0 == v->size );
+    
+    Vector* f = alloc_vec();
+    assert( NULL != f );
+    assert( 0 == f->size );
+    
+    // Test extend_vec
+    f = extend_vec( v, 1.0 );
+    assert( NULL != f );
+    assert( 1 == f->size);
+    assert( 1.0 == f->elements[0] );
+    
+    dealloc_vec(v);
+    v = f;
+    
+    f = extend_vec( v, 2.0 );
+    assert( NULL != f );
+    assert( 2 == f->size );
+    assert( 1.0 == f->elements[0] );
+    assert( 2.0 == f->elements[1] );
+    
+    dealloc_vec(v);
+    v = f;
 
-        // Test scalar_plus
-        assert( NULL != scalar_plus(v, 10.0) );
-        assert( 11.0 == v->elements[0] );
-        assert( 12.0 == v->elements[1] );
+    // Test print_vec.
+    assert( print_vec(v) );
 
-        // Test scalar_minus
-        assert( NULL != scalar_minus(v, 1.0) );
-        assert( 10.0 == v->elements[0] );
-        assert( 11.0 == v->elements[1] );
+    // Test scalar_plus
+    assert( NULL != scalar_plus(v, 10.0) );
+    assert( 11.0 == v->elements[0] );
+    assert( 12.0 == v->elements[1] );
+
+    // Test scalar_minus
+    assert( NULL != scalar_minus(v, 1.0) );
+    assert( 10.0 == v->elements[0] );
+    assert( 11.0 == v->elements[1] );
         
-        // Test scalar_mult
-        assert( NULL != scalar_mult(v, 2.0) );
-        assert( 20.0 == v->elements[0] );
-        assert( 22.0 == v->elements[1] );
+    // Test scalar_mult
+    assert( NULL != scalar_mult(v, 2.0) );
+    assert( 20.0 == v->elements[0] );
+    assert( 22.0 == v->elements[1] );
 
-        // Test scalar_div
-        assert( NULL != scalar_div(v, 2.0) );
-        assert( 10.0 == v->elements[0] );
-        assert( 11.0 == v->elements[1] );
+    // Test scalar_div
+    assert( NULL != scalar_div(v, 2.0) );
+    assert( 10.0 == v->elements[0] );
+    assert( 11.0 == v->elements[1] );
 
-        // Test dealloc_vec:
-        // Unfortunately, no way to be completely sure that
-        // deallocation occurred successfully.
-        dealloc_vec(v);	
-	
+    // Test dealloc_vec:
+    // Unfortunately, no way to be completely sure that
+    // deallocation occurred successfully.
+    dealloc_vec(v); 
+    
 #endif // TESTING
-	return EXIT_SUCCESS;
+
+    return EXIT_SUCCESS;
 }
