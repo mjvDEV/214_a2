@@ -16,8 +16,6 @@
 #include <assert.h> // for: assert()
 #include <float.h>  // for: FLT_MAX
 
-using namespace std;
-
 // An Elem is a single-precision floating point value.
 typedef float Elem;
 // ... (Elem e, ...) {
