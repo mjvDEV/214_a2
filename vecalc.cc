@@ -10,11 +10,12 @@
  * Created with Kate editor.
  */
 
-#include <stdio.h>  // for: puts(), printf(), fputs()
+#include <stdio.h>  // for: puts(), printf()
 #include <stdint.h> // for: uint16_t type
 #include <stdlib.h> // for: EXIT_SUCCESS, EXIT_FAILURE
 #include <assert.h> // for: assert()
 #include <float.h>  // for: FLT_MAX
+#include <math.h>   // for: fabs()
 
 using namespace std;
 
@@ -54,7 +55,6 @@ struct Vector {
 //      :: false if print unsuccessful.
 bool print_vec(Vector* v) {
     if ( NULL == v) {
-        fputs("ERROR: print_vec() failed.\n", stderr);
         return false;
     }
     puts("Printing vector contents...");
@@ -74,8 +74,7 @@ bool print_vec(Vector* v) {
 //      :: NULL if unsuccessful.
 Vector* alloc_vec(void) {
     Vector* v = new Vector;
-    if ( NULL == v ) {
-        fputs("ERROR: alloc_vec() failed.\n", stderr);
+    if ( NULL == v ) {        
         return NULL;
     }
     v->size = 0;
@@ -92,8 +91,12 @@ Vector* alloc_vec(void) {
 //  No return value.
 //  effect  :: v deallocated.
 void dealloc_vec(Vector* v) {
-    delete [] v->elements;
-    delete v;
+    if ( NULL != v ) {
+        if ( NULL != v->elements ) {
+            delete [] v->elements;
+        }
+        delete v;
+    }
 }
 
 // extend_vec:
@@ -110,8 +113,7 @@ Vector* extend_vec(Vector* v, Elem e) {
     Vector* f = alloc_vec(); 
     if (    ( NULL ==  v)           || 
             ( 65535 <=  v->size)    || 
-            ( NULL ==  f)   ) {
-        fputs("ERROR: extend_vec() failed.\n", stderr);
+            ( NULL ==  f)   ) {      
         return NULL;
     }
 
@@ -135,19 +137,31 @@ Vector* extend_vec(Vector* v, Elem e) {
 // Out:
 //  return  :: pointer to the modified vector.
 Vector* scalar_plus(Vector* v, Elem e) {
+    // To protect data, use second vector for addition,
+    // then return second vector if addition was successful.
+    // Vector remains unchanged this way if error is encountered
+    // halfway through operation.
+    Vector* f = alloc_vec();
     if (    ( NULL == v )   ||
-            ( 0 == v->size) ) {
-        fputs("ERROR: scalar_plus() failed.\n", stderr);
+            ( 0 == v->size) ||
+            ( NULL == f )   ) {       
         return NULL;
     }
+
+    f->size = v->size;
+    f->elements = new Elem[f->size];
+
+    if ( NULL == f->elements ) {
+        return NULL;
+    }
+
     for (uint16_t i = 0; i < v->size; i++) {
-        if ( e > ( FLT_MAX - v->elements[i] ) ) {
-            fputs("ERROR: FLT_MAX exceeded in scalar_plus().\n", stderr);
+        if ( e > ( FLT_MAX - v->elements[i] ) ) {         
             return NULL;
         }
-        v->elements[i] += e;
+        f->elements[i] = v->elements[i] + e;
     }
-    return v;
+    return f;
 }
 
 // scalar_minus:
@@ -157,8 +171,7 @@ Vector* scalar_plus(Vector* v, Elem e) {
 //  v->size != 0
 // Out:
 //  return  :: pointer to the modified vector.
-Vector* scalar_minus(Vector* v, Elem e) {
-    fputs("ERROR: scalar_minus() failed.\n", stderr);
+Vector* scalar_minus(Vector* v, Elem e) { 
     return NULL;
 }
 
@@ -170,7 +183,6 @@ Vector* scalar_minus(Vector* v, Elem e) {
 // Out:
 //  return  :: pointer to the modified vector.
 Vector* scalar_mult(Vector* v, Elem e) {
-    fputs("ERROR: scalar_mult() failed.\n", stderr);
     return NULL;
 }
 
@@ -182,8 +194,7 @@ Vector* scalar_mult(Vector* v, Elem e) {
 //  e != 0
 // Out:
 //  return  :: pointer to the modified vector.
-Vector* scalar_div(Vector* v, Elem e) {
-    fputs("ERROR: scalar_div() failed.\n", stderr);
+Vector* scalar_div(Vector* v, Elem e) { 
     return NULL;
 }
 
@@ -228,13 +239,18 @@ int main(int, char**) {
     Vector* f = alloc_vec();
     assert( NULL != f );
     assert( 0 == f->size );
+
+    // Test dealloc_vec
+    // NOTE: No way to know for sure that deallocation worked.
+    // Can test on NULL values to prevent crashes though.
+    dealloc_vec(f); // f->elements is NULL.
+    dealloc_vec(NULL);
     
     // Test extend_vec
     f = extend_vec( v, 1.0 );
     assert( NULL != f );
-    assert( 1 == f->size);
-    assert( 1.0 == f->elements[0] );
-    
+    assert( 1 == f->size );
+    assert( 1.0 == f->elements[0] ); 
     dealloc_vec(v);
     v = f;
     
@@ -242,33 +258,61 @@ int main(int, char**) {
     assert( NULL != f );
     assert( 2 == f->size );
     assert( 1.0 == f->elements[0] );
-    assert( 2.0 == f->elements[1] );
-    
+    assert( 2.0 == f->elements[1] ); 
     dealloc_vec(v);
     v = f;
 
+    // Test fail condition.
+    f = extend_vec( NULL, 100 );
+    assert( NULL == f );
+
     // Test print_vec.
     assert( print_vec(v) );
+    assert( !print_vec(NULL) );
 
     // Test scalar_plus
-    assert( NULL != scalar_plus(v, 10.0) );
+    f = scalar_plus( v, 10.0 );
+    assert( NULL != f );
+    assert( 11.0 == f->elements[0] );
+    assert( 12.0 == f->elements[1] );
+    dealloc_vec(v);
+    v = f;
+    assert( NULL == scalar_plus(NULL, 100) );
+
+    // Test overflow protection in scalar_plus
+    f = scalar_plus( v, 4.40282e+38 );
+    assert( NULL == f );
+
+    // Test original data persists after failed scalar_plus.
     assert( 11.0 == v->elements[0] );
     assert( 12.0 == v->elements[1] );
 
     // Test scalar_minus
-    assert( NULL != scalar_minus(v, 1.0) );
-    assert( 10.0 == v->elements[0] );
-    assert( 11.0 == v->elements[1] );
+    f = scalar_minus( v, 1.0 );
+    assert( NULL != f );
+    assert( 10.0 == f->elements[0] );
+    assert( 11.0 == f->elements[1] );
+    dealloc_vec(v);
+    v = f;
+    assert( NULL == scalar_minus(NULL, 100) );
         
     // Test scalar_mult
-    assert( NULL != scalar_mult(v, 2.0) );
-    assert( 20.0 == v->elements[0] );
-    assert( 22.0 == v->elements[1] );
+    f = scalar_mult( v, 2.0 );
+    assert( NULL != f );
+    assert( 20.0 == f->elements[0] );
+    assert( 22.0 == f->elements[1] );
+    dealloc_vec(v);
+    v = f;
+    assert( NULL == scalar_mult(NULL, 100) );
 
     // Test scalar_div
-    assert( NULL != scalar_div(v, 2.0) );
-    assert( 10.0 == v->elements[0] );
-    assert( 11.0 == v->elements[1] );
+    f = scalar_div( v, 2.0 );
+    assert( NULL != f );
+    assert( 10.0 == f->elements[0] );
+    assert( 11.0 == f->elements[1] );
+    dealloc_vec(v);
+    v = f;
+    assert( NULL == scalar_div(NULL, 100) );
 
     // Test dealloc_vec:
     // Unfortunately, no way to be completely sure that
