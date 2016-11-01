@@ -79,7 +79,7 @@ Vector* alloc_vec(void) {
     return NULL;
   }
   v->size = 0;
-  v->elements = new Elem[v->size];
+  v->elements = NULL;
   if ( NULL == v->elements) {
     fputs("ERROR: alloc_vec() failed.\n", stderr);
     return NULL;
@@ -118,7 +118,8 @@ Vector* extend_vec(Vector* v, Elem e) {
    fputs("ERROR: extend_vec() failed.\n", stderr);
    return NULL;
   }
-  
+
+  f->elements = new Elem[v->size + 1];
   for (uint16_t i = 0; i < v->size; i++) {
     f->size++;
     f->elements[i] = v->elements[i];
@@ -137,7 +138,8 @@ Vector* extend_vec(Vector* v, Elem e) {
 // Out:
 //	return	:: pointer to the modified vector.
 Vector* scalar_plus(Vector* v, Elem e) {
-  if ( NULL == v ){
+  if (	( NULL == v )	||
+      	( 0 == v->size) ) {
     fputs("ERROR: scalar_plus() failed.\n", stderr);
     return NULL;
   }
