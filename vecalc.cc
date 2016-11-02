@@ -271,11 +271,7 @@ int main(int, char**) {
         assert( 2.0 == f->elements[i] );
         dealloc_vec(o);
         o = f;
-        if ( 0 == i % 1000 ) {
-            printf("1000s: %u\n", i);
-        }
     }
-    puts("exited overflow loop.");
     f = extend_vec( o, 2.0 );
     assert( NULL == f );
     dealloc_vec(o);
