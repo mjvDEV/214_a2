@@ -259,6 +259,28 @@ int main(int, char**) {
     dealloc_vec(v);
     v = f;
 
+#ifdef TEST_OVERFLOW
+    // Test overflow protection on v->size.
+    Vector* o = alloc_vec();
+    assert( NULL != o );
+    assert( 0 == o->size );
+    for (uint16_t i = 0; i < 65535; i++) {
+        f = extend_vec( o, 2.0 );
+        assert( NULL != f );
+        assert( i + 1 == f->size );
+        assert( 2.0 == f->elements[i] );
+        dealloc_vec(o);
+        o = f;
+        if ( 0 == i % 1000 ) {
+            printf("1000s: %u\n", i);
+        }
+    }
+    puts("exited overflow loop.");
+    f = extend_vec( o, 2.0 );
+    assert( NULL == f );
+    dealloc_vec(o);
+#endif // TEST_OVERFLOW
+
     // Test fail condition.
     f = extend_vec( NULL, 100 );
     assert( NULL == f );
